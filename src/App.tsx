@@ -5,7 +5,7 @@ import {
   Settings as SettingsIcon, FileText, Camera as CameraIcon, Play, Radio, Sparkles, 
   Wifi, Bluetooth, Battery, BatteryCharging, Lock, Unlock, ArrowDown, ChevronRight,
   Bell, Check, X, Tablet, Gamepad2, Paintbrush, Music, MapPin, Calculator as CalcIcon,
-  HelpCircle, Globe, TrendingUp, Sun, Volume2, Moon
+  HelpCircle, Globe, TrendingUp, Sun, Volume2, Moon, Mail
 } from "lucide-react";
 
 // Sub-app imports
@@ -24,6 +24,8 @@ import StocksApp from "./components/apps/StocksApp";
 import GoogleApp from "./components/apps/GoogleApp";
 import YouTubeApp from "./components/apps/YouTubeApp";
 import GitHubApp from "./components/apps/GitHubApp";
+import GmailApp from "./components/apps/GmailApp";
+import Win10App from "./components/apps/Win10App";
 
 export default function App() {
   // Lock screen state
@@ -206,6 +208,10 @@ export default function App() {
         return <YouTubeApp />;
       case "github":
         return <GitHubApp />;
+      case "gmail":
+        return <GmailApp />;
+      case "win10":
+        return <Win10App />;
       case "paint":
         return <PaintApp />;
       case "game":
@@ -288,6 +294,8 @@ export default function App() {
     switch (id) {
       case "gemini":
         return <Sparkles className="w-5.5 h-5.5 text-white fill-current text-indigo-300 animate-pulse" />;
+      case "gmail":
+        return <Mail className="w-5.5 h-5.5 text-white" />;
       case "paint":
         return <Paintbrush className="w-5.5 h-5.5 text-white" />;
       case "game":

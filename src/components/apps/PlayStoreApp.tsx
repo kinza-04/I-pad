@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PlayApp } from "../../types";
 import { 
-  Search, Star, Download, ShieldCheck, Tag, Info, ChevronLeft, Check, Award, Sparkles
+  Search, Star, Download, ShieldCheck, Tag, Info, ChevronLeft, Check, Award, Sparkles, MessageSquare, Plus, CheckCircle
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
@@ -11,10 +11,42 @@ interface PlayStoreProps {
   onLaunchApp: (id: string) => void;
 }
 
+interface AppReview {
+  id: string;
+  user: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
+const DEFAULT_REVIEWS: Record<string, AppReview[]> = {
+  gemini: [
+    { id: "g1", user: "Kinza Murtaza", rating: 5, comment: "The server-side system controller is absolutely state-of-the-art. I can talk with Gemini naturally and it answers correctly, adjusting tablet properties like brightness or checking storage instantly!", date: "Jun 14, 2026" },
+    { id: "g2", user: "Haris K.", rating: 5, comment: "I love the sleek styling in the dark mesh mode. Highly responsive.", date: "Jun 12, 2026" }
+  ],
+  gmail: [
+    { id: "gm1", user: "Sarah Mitchell", rating: 5, comment: "Exactly what I wanted! Beautiful folders layout and the draft-writing assistant helper can write super polite business templates for me.", date: "Jun 14, 2026" },
+    { id: "gm2", user: "Murtaza Ali", rating: 4, comment: "Works flawlessly in the tablet browser-chrome, very premium split design.", date: "Jun 13, 2026" }
+  ],
+  youtube: [
+    { id: "yt1", user: "DeveloperPro", rating: 5, comment: "Real embed frames render WWII retrospectives, WWDC guides & tech reviews perfectly.", date: "Jun 14, 2026" }
+  ],
+  paint: [
+    { id: "p1", user: "CreativeNook", rating: 5, comment: "Very precise touch physics. Excellent color options.", date: "Jun 10, 2026" }
+  ]
+};
+
 export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlayStoreProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [selectedApp, setSelectedApp] = useState<PlayApp | null>(null);
+
+  // Review states
+  const [reviews, setReviews] = useState<Record<string, AppReview[]>>(DEFAULT_REVIEWS);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
+  const [reviewerName, setReviewerName] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState(false);
 
   const renderAppIcon = (icon: string, isBig: boolean = false) => {
     if (icon === "Sparkles") {
@@ -42,7 +74,8 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
 
   const filteredApps = apps.filter(app => {
     const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          app.developer.toLowerCase().includes(searchQuery.toLowerCase());
+                          app.developer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          app.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || app.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
@@ -70,6 +103,41 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
         }
       }
     );
+  };
+
+  const submitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewerName.trim() || !newComment.trim()) {
+      alert("Please fill out your name and comment.");
+      return;
+    }
+
+    if (!selectedApp) return;
+
+    const addedReview: AppReview = {
+      id: Date.now().toString(),
+      user: reviewerName,
+      rating: newRating,
+      comment: newComment,
+      date: new Date().toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })
+    };
+
+    setReviews(prev => {
+      const existing = prev[selectedApp.id] || [];
+      return {
+        ...prev,
+        [selectedApp.id]: [addedReview, ...existing]
+      };
+    });
+
+    setReviewSuccess(true);
+    setReviewerName("");
+    setNewComment("");
+    setNewRating(5);
+
+    setTimeout(() => {
+      setReviewSuccess(false);
+    }, 3000);
   };
 
   // Get reactive instance of currently opened app
@@ -113,7 +181,7 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
           <button 
             id="back_to_catalog"
             onClick={() => setSelectedApp(null)}
-            className="group flex items-center gap-1.5 mb-5 text-gray-500 hover:text-emerald-600 font-medium text-xs transition-colors"
+            className="group flex items-center gap-1.5 mb-5 text-gray-500 hover:text-emerald-600 font-medium text-xs transition-colors border-0 bg-transparent cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             Back to store
@@ -146,16 +214,16 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
                     <button
                       id={`launch_app_${reactiveSelectedApp.id}`}
                       onClick={() => onLaunchApp(reactiveSelectedApp.id)}
-                      className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.02] active:scale-[0.98] text-xs font-semibold rounded-lg transition-all duration-200 shadow-md flex items-center gap-2"
+                      className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.02] active:scale-[0.98] text-xs font-semibold rounded-lg transition-all duration-200 shadow-md flex items-center gap-2 cursor-pointer border-0"
                     >
-                      Open
+                      Open App
                     </button>
-                    <span className="text-xs text-gray-500 font-medium flex items-center gap-1 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
-                      <Check className="w-4 h-4 text-emerald-500 stroke-[3px]" /> Installed to iPad Dock
+                    <span className="text-[11px] text-gray-500 font-medium flex items-center gap-1 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                      <Check className="w-3.5 h-3.5 text-emerald-500 stroke-[3px]" /> Installed onto Home Grid
                     </span>
                   </>
                 ) : reactiveSelectedApp.installing ? (
-                  <div className="w-full max-w-xs bg-gray-100 h-9 rounded-lg overflow-hidden relative border border-gray-200 shadow-inner flex items-center px-4">
+                  <div className="w-full max-w-xs bg-gray-105 h-9 rounded-lg overflow-hidden relative border border-gray-200 shadow-inner flex items-center px-4">
                     <div 
                       className="absolute left-0 top-0 bottom-0 bg-emerald-600 transition-all duration-150"
                       style={{ width: `${reactiveSelectedApp.progress}%` }}
@@ -168,7 +236,7 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
                   <button
                     id={`install_btn_${reactiveSelectedApp.id}`}
                     onClick={() => handleInstallClick(reactiveSelectedApp)}
-                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.02] active:scale-[0.98] text-xs font-bold rounded-lg transition-all duration-200 shadow-md flex items-center gap-2 cursor-pointer"
+                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.02] active:scale-[0.98] text-xs font-bold rounded-lg transition-all duration-200 shadow-md flex items-center gap-2 cursor-pointer border-0"
                   >
                     <Download className="w-4 h-4" /> Install App
                   </button>
@@ -205,8 +273,8 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
             </div>
           </div>
 
-          {/* Screenshots Section */}
-          <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-xs">
+          {/* Highlights Screenshots Section */}
+          <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-xs mb-5">
             <h3 className="text-sm font-bold text-gray-900 mb-3">Highlights</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {reactiveSelectedApp.screenshots.map((shot, idx) => (
@@ -220,6 +288,107 @@ export default function PlayStoreApp({ apps, onInstallApp, onLaunchApp }: PlaySt
                   <p className="text-xxs font-medium text-slate-300 leading-snug">{shot}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* New Interactive Reviews System */}
+          <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                <MessageSquare className="w-4.5 h-4.5 text-emerald-600" /> Ratings & Reviews
+              </h3>
+              <span className="text-[11px] font-semibold text-gray-550 border border-gray-200 px-2.5 py-0.5 rounded-full bg-slate-50">
+                Sorted by most helpful
+              </span>
+            </div>
+
+            {/* Write a review box */}
+            <form onSubmit={submitReview} className="bg-[#fcfdfe] border border-emerald-100 rounded-xl p-4 space-y-3">
+              <p className="text-xs font-bold text-gray-800 flex items-center gap-1">
+                <Plus className="w-4 h-4 text-emerald-600" /> Rate and review this app
+              </p>
+
+              {reviewSuccess && (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-250 text-emerald-800 rounded-lg text-xs font-bold flex items-center gap-1.5 animate-fade-in">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" /> Thank you! Your review has been published live to the Play Store ledger.
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* Reviewer Name */}
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Your Name</label>
+                  <input 
+                    type="text" 
+                    value={reviewerName}
+                    onChange={(e) => setReviewerName(e.target.value)}
+                    placeholder="e.g. Kinza Murtaza"
+                    className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-hidden"
+                    required
+                  />
+                </div>
+
+                {/* Rating selection stars */}
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Star Rating</label>
+                  <div className="flex items-center gap-1 pt-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setNewRating(star)}
+                        className="border-0 bg-transparent cursor-pointer p-0.5 focus:outline-hidden text-amber-400 transition hover:scale-110"
+                      >
+                        <Star className={`w-5.5 h-5.5 ${star <= newRating ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Review Comment */}
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Comment review</label>
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="How is your experience with this app on the iPad OS backend? Write details..."
+                  rows={2}
+                  className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:outline-hidden font-normal"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg cursor-pointer border-0 hover:scale-102 active:scale-98 transition-all"
+              >
+                Post Review
+              </button>
+            </form>
+
+            {/* List current reviews */}
+            <div className="space-y-3 pt-2">
+              {(reviews[reactiveSelectedApp.id] || []).length === 0 ? (
+                <p className="text-xs text-gray-400 font-medium italic text-center py-4">No reviews written yet. Be the first to rate!</p>
+              ) : (
+                (reviews[reactiveSelectedApp.id] || []).map((rev) => (
+                  <div key={rev.id} className="p-3 bg-gray-50 border border-gray-100 rounded-xl space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-bold text-gray-800">{rev.user}</span>
+                      <span className="text-[10px] font-mono text-gray-400">{rev.date}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`w-3 h-3 ${i < rev.rating ? "fill-amber-400 text-amber-400" : "text-gray-200"}`} />
+                      ))}
+                    </div>
+
+                    <p className="text-[11px] text-gray-600 leading-normal font-normal pl-0.5 pt-0.5">{rev.comment}</p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

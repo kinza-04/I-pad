@@ -84,6 +84,27 @@ export const PLAY_STORE_APPS: PlayApp[] = [
     ]
   },
   {
+    id: "gmail",
+    name: "Gmail",
+    packageName: "com.google.android.gm",
+    icon: "✉️",
+    iconColor: "bg-radial from-rose-500 via-red-600 to-rose-700 text-white",
+    developer: "Google LLC",
+    rating: 4.8,
+    reviewsCount: "118M",
+    size: "39 MB",
+    description: "The official Gmail app brings a beautiful split-pane email client to your tablet. Built-in Gemini AI smart compose helps you generate professional email drafts instantly. Use AI Thread Summarization to digest long chains, work with multiple folders (Inbox, Starred, Sent, Trash), and enjoy intelligent local workspace integration.",
+    category: "productivity",
+    isInstalled: false,
+    installing: false,
+    progress: 0,
+    screenshots: [
+      "Stunning split-pane mailbox viewer",
+      "Interactive Smart Compose with Gemini AI assistant",
+      "One-click AI Email summarizer and reply drafts"
+    ]
+  },
+  {
     id: "paint",
     name: "Pixel Paint Pro",
     packageName: "com.adobe.paint.android",
@@ -165,6 +186,27 @@ export const PLAY_STORE_APPS: PlayApp[] = [
       "Full scientific support panels",
       "Historical calculations list",
       "Minimalist material-you palette"
+    ]
+  },
+  {
+    id: "win10",
+    name: "Windows 10 Mobile OS",
+    packageName: "com.microsoft.windows10",
+    icon: "💻",
+    iconColor: "bg-[#0078d7] text-white",
+    developer: "Microsoft Corporation (Simulated)",
+    rating: 4.9,
+    reviewsCount: "89M",
+    size: "65 MB",
+    description: "Launch a fully virtualized, highly interactive Windows 10 desktop environment right inside your iPad. Features a real-time searchable Start Menu with live tiles, adjustable personal wallpapers, dynamic directory navigation on File Explorer (C:\\ Drive), interactive CMD terminal interpreter with command history, writable Notepad with custom file creation, full MS Paint canvas, Internet Explorer browser simulation, and active Minesweeper minigame boards!",
+    category: "creativity",
+    isInstalled: false,
+    installing: false,
+    progress: 0,
+    screenshots: [
+      "State-of-the-art live responsive taskbar & start menu",
+      "Writable Notepad, customizable MS Paint whiteboard & dynamic command interpreter",
+      "C:\\ drive directory navigation & active Minesweeper game mechanics"
     ]
   },
   // --- 50 REAL GAMES CATALOG ---
