@@ -1,0 +1,6 @@
+{
+  "name": "iPad PlayStore Simulator",
+  "description": "An interactive, high-fidelity iPad simulator featuring lock screen, dynamic widget docks, settings system, and an integrated Android Google Play Store supporting downloading and running fully operational mini-apps (Gemini Assistant, Sketch, custom game, Maps, Synthesizer, Paint and more!).",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
