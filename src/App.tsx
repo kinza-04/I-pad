@@ -134,7 +134,72 @@ export default function App() {
           />
         );
       case "gemini":
-        return <GeminiApp />;
+        return (
+          <GeminiApp 
+            onExecuteAction={(action: { type: string; value: any }) => {
+              switch (action.type) {
+                case "SET_WALLPAPER":
+                  if (typeof action.value === "string") {
+                    setActiveWallpaperId(action.value);
+                  }
+                  break;
+                case "SET_BRIGHTNESS":
+                  setScreenBrightness(Number(action.value));
+                  break;
+                case "SET_VOLUME":
+                  setSoundVolume(Number(action.value));
+                  break;
+                case "TOGGLE_WIFI":
+                  setWifiEnabled(!!action.value);
+                  break;
+                case "TOGGLE_BLUETOOTH":
+                  setBluetoothEnabled(!!action.value);
+                  break;
+                case "SET_NAME":
+                  if (typeof action.value === "string") {
+                    setTabletName(action.value);
+                  }
+                  break;
+                case "LOCK_DEVICE":
+                  setIsLocked(true);
+                  break;
+                case "OPEN_APP":
+                  if (typeof action.value === "string") {
+                    setActiveAppId(action.value);
+                    setNotifications(prev => [
+                      `Assistant opened app: ${action.value.toUpperCase()}`,
+                      ...prev
+                    ]);
+                  }
+                  break;
+                default:
+                  console.warn("Unrecognized system action:", action);
+              }
+            }}
+            systemMetrics={{
+              wifiEnabled,
+              bluetoothEnabled,
+              batteryLevel,
+              isCharging,
+              soundVolume,
+              screenBrightness,
+              nightShiftActive,
+              tabletName,
+              activeWallpaperId,
+              availableWallpapers: WALLPAPERS.map(w => ({ id: w.id, name: w.name })),
+              availableApps: [
+                { id: "safari", name: "Safari Browser" },
+                { id: "notes", name: "Notepad Docs" },
+                { id: "camera", name: "FaceTime & Filters" },
+                { id: "stocks", name: "Stocks Terminal" },
+                { id: "settings", name: "Settings" },
+                { id: "github", name: "GitHub Client" },
+                { id: "playstore", name: "Google Play" },
+                ...apps.filter(app => app.isInstalled).map(a => ({ id: a.id, name: a.name }))
+              ]
+            }}
+          />
+        );
       case "google":
         return <GoogleApp />;
       case "youtube":

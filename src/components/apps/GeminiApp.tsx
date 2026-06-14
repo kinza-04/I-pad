@@ -3,7 +3,7 @@ import { ChatMessage } from "../../types";
 import { Sparkles, Send, Trash2, Bot, User, CornerDownLeft, CircleAlert } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
-export default function GeminiApp() {
+export default function GeminiApp({ onExecuteAction, systemMetrics }: { onExecuteAction?: (act: any) => void; systemMetrics?: any }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -11,10 +11,10 @@ export default function GeminiApp() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const starterPrompts = [
-    { label: "💡 Explaining Logic", text: "How does Android run on an Apple M4 iPad?" },
-    { label: "📝 Creative Writing", text: "Draft a dynamic cyberpunk advertisement for an iPad Play Store app." },
-    { label: "🐍 Classic Code", text: "Explain a fast prime-number sieve in python with clean comments." },
-    { label: "🚀 Playful Advice", text: "What is the funniest pixel retro game name you can imagine?" },
+    { label: "🎨 Aesthetic Theme", text: "Please change the wallpaper to Neo Tokyo" },
+    { label: "🚀 Launch Application", text: "Open YouTube and show me some videos" },
+    { label: "🔊 Adjust Audio", text: "Set volume to 100% and screen brightness to 100%" },
+    { label: "🔒 Dynamic Control", text: "Go ahead and lock my tablet securely" },
   ];
 
   // Instantly seed chat with introductory greetings
@@ -62,7 +62,10 @@ export default function GeminiApp() {
       const response = await fetch("/api/gemini/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: payloadMessages })
+        body: JSON.stringify({ 
+          messages: payloadMessages,
+          systemMetrics: systemMetrics
+        })
       });
 
       if (!response.ok) {
@@ -79,6 +82,11 @@ export default function GeminiApp() {
       };
 
       setMessages(prev => [...prev, aiMsg]);
+
+      // If Gemini returned an active assistant command action, execute it on the tablet chassis
+      if (data.action && onExecuteAction) {
+        onExecuteAction(data.action);
+      }
     } catch (err: any) {
       console.error(err);
       setErrorText(err.message || "Failed to contact proxy API server.");
