@@ -1,6 +1,89 @@
 import React, { useState, useEffect } from "react";
 import { Search, Youtube, Play, X, User, Heart, ThumbsUp, Calendar, Eye } from "lucide-react";
 
+// Robust local database generator when the Express API container is offline or running client-only
+function getLocalClientVideos(query?: string) {
+  const baseVideos = [
+    { videoId: "JfJYMxU8AOY", title: "lofi hip hop radio 📚 beats to relax/study to", channelName: "Lofi Girl", views: "Live", duration: "LIVE", publishedTime: "Ongoing", category: "Lofi" },
+    { videoId: "7v-P-S88f_M", title: "Introducing Gemini 1.5 Pro - Next-Gen AI Assistant", channelName: "Google", views: "2.4M views", duration: "3:42", publishedTime: "1 month ago", category: "AI" },
+    { videoId: "tN9SGA3H-Y8", title: "M4 iPad Pro Review: Ultra Thin, Hyper Fast!", channelName: "MKBHD", views: "5.8M views", duration: "14:20", publishedTime: "2 weeks ago", category: "Apple" },
+    { videoId: "45Z-m0bW3p4", title: "Neon City Synthwave - 1 Hour Retro Drive Music", channelName: "Synthwave Beats", views: "1.2M views", duration: "1:00:25", publishedTime: "3 months ago", category: "Lofi" },
+    { videoId: "kJQP7kiw5Fk", title: "The Ultimate History of Retro Video Games!", channelName: "Retro Gamer TV", views: "890K views", duration: "25:10", publishedTime: "6 months ago", category: "Gaming" },
+    { videoId: "X3paOmcrTjQ", title: "React & Vite - Crash Course for Fullstack Devs", channelName: "TechwithMurtaza", views: "450K views", duration: "48:15", publishedTime: "1 month ago", category: "Coding" },
+    { videoId: "hHW1oY26kxQ", title: "1 Hour Deep Sleep Lofi - Soft Piano Waves", channelName: "Ambient Melodies", views: "300K views", duration: "1:00:00", publishedTime: "5 days ago", category: "Lofi" },
+    { videoId: "2g811Eo7K8U", title: "Build an iPad OS clone with React & Tailwind", channelName: "DevAcademy", views: "120K views", duration: "32:14", publishedTime: "1 week ago", category: "Coding" },
+    { videoId: "V-_O7nl0Ii0", title: "M4 Pro Mac mini Review: The Best Compact Desktop?", channelName: "TechScribe", views: "750K views", duration: "12:10", publishedTime: "3 weeks ago", category: "Apple" },
+    { videoId: "f02mOEt11g4", title: "Exploring Mars in 8K: Dynamic Rover Imagery", channelName: "CosmoSphere", views: "1.5M views", duration: "18:45", publishedTime: "2 months ago", category: "Science" },
+    { videoId: "D7YIat_0mI0", title: "Deep Focus Ambient Music for Coding & Writing", channelName: "Lofi Girl", views: "850K views", duration: "31:00", publishedTime: "10 days ago", category: "Lofi" },
+    { videoId: "sK33W0KsnG8", title: "What is Quantum Computing? Simplified for Beginners", channelName: "Kurzgesagt", views: "3.2M views", duration: "10:15", publishedTime: "2 months ago", category: "Science" },
+    { videoId: "_GuOjXYl5ew", title: "The Beautiful Architecture of Shibuya, Tokyo Vibe", channelName: "TravelSphere", views: "400K views", duration: "15:30", publishedTime: "2 months ago", category: "Travel" },
+    { videoId: "T767O8qY6g4", title: "Retro Arcade Game Soundtrack - Synth & Chiptunes", channelName: "Chiptune Heaven", views: "180K views", duration: "45:00", publishedTime: "4 months ago", category: "Gaming" },
+    { videoId: "yW8D1Tj_G08", title: "How to Build responsive CSS Grid Layouts fast", channelName: "WebDevSolutions", views: "250K views", duration: "16:20", publishedTime: "3 months ago", category: "Coding" }
+  ];
+
+  const finalVideos: any[] = [];
+  const subjects = [
+    "Ultimate Tutorial & Config",
+    "Features Every User Needs",
+    "Explained in 10 Minutes",
+    "The Future of This Platform",
+    "Unboxing & Detailed Review",
+    "Ambient Study Lounge session",
+    "Deep Dive Code Walkthrough",
+    "24/7 Live Stream Radio",
+    "Beginner to Advanced masterclass",
+    "Cinematic Trailer & Gameplay"
+  ];
+  const creators = [
+    "MKBHD Tech", "Lofi Studio", "Linus Tech Crew", "TechWithKinza", "Google Workspace", 
+    "FreeCodeCamp", "Veritasium Core", "Kurzgesagt Global", "Apple Insider Pro", "Fireship Dev", 
+    "DesignJoy", "CodeCrafters", "RetroGamer HQ", "NextGen System"
+  ];
+
+  for (let i = 0; i < 100; i++) {
+    const base = baseVideos[i % baseVideos.length];
+    const indexModifier = Math.floor(i / baseVideos.length);
+    let title = base.title;
+    let duration = base.duration;
+    let views = base.views;
+    let publishedTime = base.publishedTime;
+    let channelName = base.channelName;
+    
+    if (indexModifier > 0) {
+      const sub = subjects[i % subjects.length];
+      const cr = creators[i % creators.length];
+      title = `${base.category} Subsystem: ${sub}`;
+      channelName = cr;
+      duration = `${Math.floor(Math.random() * 45) + 5}:${Math.floor(Math.random() * 50) + 10}`;
+      views = `${(Math.random() * 2.8 + 0.1).toFixed(1)}M views`;
+      publishedTime = `${Math.floor(Math.random() * 11) + 1} months ago`;
+    }
+
+    finalVideos.push({
+      videoId: base.videoId,
+      title: `${title} - Part ${indexModifier + 1} (Video #${i + 1})`,
+      thumbnail: `https://i.ytimg.com/vi/${base.videoId}/hqdefault.jpg`,
+      channelName,
+      views,
+      duration,
+      publishedTime,
+      category: base.category
+    });
+  }
+
+  if (query) {
+    const queryLower = query.toLowerCase();
+    const filtered = finalVideos.filter(v => 
+      v.title.toLowerCase().includes(queryLower) || 
+      v.channelName.toLowerCase().includes(queryLower) ||
+      (v.category && v.category.toLowerCase().includes(queryLower))
+    );
+    return filtered.length > 0 ? filtered : finalVideos.slice(0, 24);
+  }
+
+  return finalVideos;
+}
+
 export default function YouTubeApp() {
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -8,36 +91,44 @@ export default function YouTubeApp() {
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [likes, setLikes] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    // Load trending by default on launch!
+  const loadTrending = async () => {
     setIsSearching(true);
-    fetch("/api/youtube/trending")
-      .then((res) => res.json())
-      .then((data) => {
-        setVideos(data.results || []);
-        setIsSearching(false);
-      })
-      .catch((err) => {
-        console.error("YouTube App loading trending failed:", err);
-        setIsSearching(false);
-      });
+    try {
+      const res = await fetch("/api/youtube/trending");
+      if (!res.ok) throw new Error("API issue");
+      const data = await res.json();
+      setVideos(data.results && data.results.length > 0 ? data.results : getLocalClientVideos());
+    } catch (err) {
+      console.warn("YouTube App loading trending fallback:", err);
+      setVideos(getLocalClientVideos());
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const loadSearch = async (searchQuery: string) => {
+    setIsSearching(true);
+    try {
+      const res = await fetch(`/api/youtube/search?q=${encodeURIComponent(searchQuery)}`);
+      if (!res.ok) throw new Error("API issue");
+      const data = await res.json();
+      setVideos(data.results && data.results.length > 0 ? data.results : getLocalClientVideos(searchQuery));
+    } catch (err) {
+      console.warn("YouTube App search fallback:", err);
+      setVideos(getLocalClientVideos(searchQuery));
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTrending();
   }, []);
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!query.trim()) return;
-
-    setIsSearching(true);
-    fetch(`/api/youtube/search?q=${encodeURIComponent(query.trim())}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setVideos(data.results || []);
-        setIsSearching(false);
-      })
-      .catch((err) => {
-        console.error("YouTube App search error:", err);
-        setIsSearching(false);
-      });
+    loadSearch(query.trim());
   };
 
   const toggleLike = (videoId: string) => {
@@ -55,15 +146,8 @@ export default function YouTubeApp() {
           className="flex items-center gap-2 cursor-pointer" 
           onClick={() => {
             setQuery("");
-            setIsSearching(true);
-            fetch("/api/youtube/trending")
-              .then((res) => res.json())
-              .then((data) => {
-                setVideos(data.results || []);
-                setIsSearching(false);
-                setSelectedVideo(null);
-              })
-              .catch(() => setIsSearching(false));
+            loadTrending();
+            setSelectedVideo(null);
           }}
         >
           <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg border border-red-500">
@@ -197,24 +281,10 @@ export default function YouTubeApp() {
                 onClick={() => {
                   if (cat === "All") {
                     setQuery("");
-                    setIsSearching(true);
-                    fetch("/api/youtube/trending")
-                      .then((res) => res.json())
-                      .then((data) => {
-                        setVideos(data.results || []);
-                        setIsSearching(false);
-                      })
-                      .catch(() => setIsSearching(false));
+                    loadTrending();
                   } else {
                     setQuery(cat);
-                    setIsSearching(true);
-                    fetch(`/api/youtube/search?q=${encodeURIComponent(cat)}`)
-                      .then((res) => res.json())
-                      .then((data) => {
-                        setVideos(data.results || []);
-                        setIsSearching(false);
-                      })
-                      .catch(() => setIsSearching(false));
+                    loadSearch(cat);
                   }
                 }}
                 className={`px-3.5 py-1.5 rounded-full border transition-all cursor-pointer inline-flex items-center justify-center ${
